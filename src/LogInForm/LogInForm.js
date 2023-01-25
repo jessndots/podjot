@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Link, useNavigate as useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import UserContext from "../userContext";
 
 function LogInForm({logIn}) {

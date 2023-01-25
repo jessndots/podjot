@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useNavigate as useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import UserContext from "../userContext";
 
 function Profile({ editProfile }) {

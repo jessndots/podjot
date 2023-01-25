@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, Navigate as Redirect } from 'react-router-dom';
+import { Route, Routes, Redirect } from 'react-router-dom';
 import './App.css';
 import UserContext from './userContext';
 import NavBar from './NavBar/NavBar';
@@ -18,17 +18,15 @@ function App() {
   return (
     <div className="App">
       <NavBar />
-      <Routes>
-        <Route exact path="/podcasts/:podcastId/episodes/:episodeId" element={<Episode/>}/>
-        <Route exact path="/podcasts/:podcastId/episodes" element={<EpisodeList />}/>
-        <Route exact path="/podcasts/:podcastId" element={<Podcast />}/>
-        <Route exact path="/podcasts" element={<PodcastList />}/>
-        <Route exact path="/search" element={<Search />}/>
-        <Route exact path="/profile" element={<Profile />}/>
-        <Route exact path="/login" element={<LogInForm />}/>
-        <Route exact path="/signup" element={<SignUpForm />} />
-        <Route exact path="/" element={<Home />}/>        
-      </Routes>
+      <Route exact path="/podcasts/:podcastId/episodes/:episodeId" element={<Episode />} />
+      <Route exact path="/podcasts/:podcastId/episodes" element={<EpisodeList />} />
+      <Route exact path="/podcasts/:podcastId" element={<Podcast />} />
+      <Route exact path="/podcasts" element={<PodcastList />} />
+      <Route exact path="/search" element={<Search />} />
+      <Route exact path="/profile" element={<Profile />} />
+      <Route exact path="/login" element={<LogInForm />} />
+      <Route exact path="/signup" element={<SignUpForm />} />
+      <Route exact path="/" element={<Home />} />
       <Redirect to="/" />
     </div>
   );

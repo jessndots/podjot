@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate as useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 function SignUpForm({ signUp, error }) {
   const INITIAL_STATE = { firstName: "", lastName: "", email: "", username: "", password: "" };
