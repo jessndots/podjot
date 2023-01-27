@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import UserContext from "../userContext";
 
 function Profile({ editProfile }) {
   const { user } = useContext(UserContext);
-  const history = useHistory();
+  const history = useNavigate();
   const [isBeingEdited, setIsBeingEdited] = useState(false);
   const [oldUsername, setOldUsername] = useState("")
   const [formData, setFormData] = useState({firstName: user.firstName, lastName: user.lastName, email: user.email, password: user.password})

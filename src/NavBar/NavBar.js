@@ -1,55 +1,38 @@
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink} from "react-router-dom";
 import UserContext from "../userContext";
+import { Container, Button, NavDropdown, Navbar as Nbar, Nav } from "react-bootstrap";
 
 function NavBar({ logOut }) {
   const { user } = useContext(UserContext);
 
-  let activeStyle = {
-    textDecoration: "underline",
-  };
+  return (
+    <Nbar bg="light" expand="lg">
+      <Container>
+        <Nbar.Brand href="/">PodJot</Nbar.Brand>
+        <Nav.Link href="/podcasts">Discover</Nav.Link>
+        <Nav.Link href="/search">Search</Nav.Link>
+        <Nbar.Toggle aria-controls="basic-navbar-nav" />
+        <Nbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            {user.username ? (
+              <div>
+                <Nav.Link href="/profile">Account</Nav.Link>
+                <Button variant="secondary" onClick={logOut}>Log Out</Button>
+              </div>
+            ): (
+              <div>
+                <Nav.Link href="/login">Log In</Nav.Link>
+                <Nav.Link href="/signup">Sign Up</Nav.Link>
+              </div>
+            )}
 
-  let activeClassName = "underline";
-
-  if (user.username) {
-    return (
-      <nav className="NavBar">
-        <NavLink exact to="/" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>PodJot</NavLink>
-        <NavLink exact to="/podcasts" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>Podcasts</NavLink>
-        <NavLink exact to="/" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>Search</NavLink>
-        <NavLink exact to="/profile" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>{user.username}</NavLink>
-        <button onClickCapture={logOut}>Log out</button>
-      </nav>)
-  } else {
-    return (
-      <nav className="NavBar">
-        <NavLink exact to="/" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>PodJot</NavLink>
-        <NavLink exact to="/podcasts" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>Podcasts</NavLink>
-        <NavLink exact to="/search" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>Search</NavLink>
-        <NavLink exact to="/login" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>Log in</NavLink>
-        <NavLink exact to="/signup" style={({ isActive }) =>
-          isActive ? activeStyle : undefined
-        }>Sign up</NavLink>
-      </nav>);
-  }
-
-
+          </Nav>
+        </Nbar.Collapse>
+      </Container>
+    </Nbar >
+  )
 }
+
 
 export default NavBar;

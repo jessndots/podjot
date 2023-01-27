@@ -1,53 +1,86 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserContext from "../userContext";
+import { Container, Form, Button } from "react-bootstrap";
 
-function LogInForm({logIn}) {
-  const {user} = useContext(UserContext);
-  const history = useHistory();
-  const [isInvalid, setIsInvalid] = useState(false);
+function LogInForm({ logIn }) {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (user.username) {
-      history.push("/")
+      navigate("/")
     }
-  }, [user, history])
+  }, [user, navigate])
 
-  const INITIAL_STATE= {username: "", password: ""};
+  const INITIAL_STATE = { username: "", password: "" };
   const [formData, setFormData] = useState(INITIAL_STATE);
+  const [validated, setValidated] = useState();
+  const [errors, setErrors] = useState({});
 
   const handleChange = (evt) => {
-    const {name, value} = evt.target;
-    setFormData(fData => ({...fData, [name]: value}))
+    const { name, value } = evt.target;
+    setFormData(fData => ({ ...fData, [name]: value }))
   }
 
   const handleSubmit = async (evt) => {
-    evt.preventDefault();
     try {
-      const res = await logIn(formData);
-      if(res.token) {
-        setFormData(INITIAL_STATE);
-        history.push("/");
-      }
+      evt.preventDefault();
+      setErrors({})
+      const newErrors = findFormErrors()
+      if ( Object.keys(newErrors).length > 0 ) {
+        setErrors(newErrors)
+        setValidated(false);
+      } else {
+        const res = await logIn(formData);
+        if (!res.errors) {
+          setValidated(true);
+          setFormData(INITIAL_STATE);
+          navigate("/");
+        } else {
+          setErrors({other: res.errors})
+        }
+      } 
     } catch(err) {
-      setIsInvalid(true);
       return
     }
-
   }
 
-  return <div>
-    <h1>Log in to Jobly</h1>
-    <form onSubmit={handleSubmit} data-testid="form">
-      <label htmlFor="username">Username</label>
-      <input name="username" id="username" type="text" onChange={handleChange}></input><br/>
-      <label htmlFor="password">Password</label>
-      <input name="password" id="password" type="password" onChange={handleChange}></input><br/>
-      <button type="submit">Log in</button>
-    </form>
-    {isInvalid? (<p><i>Incorrect username or password.</i></p>): null}
-    <Link to="/signup">Or create an account</Link>
-  </div>
+  const findFormErrors = () => {
+    const { username, password } = formData
+    const newErrors = {}
+
+    // username errors
+    if ( !username || username === '' ) newErrors.username = 'Username is required to log in'
+
+    // password errors
+    if ( !password || password === '' ) newErrors.password = 'Password is required to log in'
+
+    return newErrors
+  }
+
+  return <Container fluid>
+    <h1>Log in to PodJot</h1>
+    <Container fluid>
+      <Form noValidate validated={validated} onSubmit={handleSubmit} >
+        <Form.Group className="mb-3" controlId="formUsername">
+          <Form.Label>Username</Form.Label>
+          <Form.Control type="email" placeholder="Username" name="username" onChange={handleChange} isInvalid={!formData.username} />
+          <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control type="password" placeholder="Password" name="password" onChange={handleChange} isInvalid={!formData.password}/>
+          <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          Log In
+        </Button>
+      </Form><br />
+      <Link to="/signup">Or create an account</Link>
+    </Container>
+  </Container>
 }
 
 export default LogInForm

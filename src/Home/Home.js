@@ -9,8 +9,8 @@ function Home() {
     )
   }
   return <div>
-    <h1>Welcome to Jobly</h1>
-    <p>Search and apply for positions at companies around the world!</p>
+    <h1>Welcome to PodJot</h1>
+    <p>Track your podcast listening with your own notes and ratings!</p>
   </div>
 }
 

@@ -76,7 +76,7 @@ class PodcastApi {
   static async logInUser(data) {
     let res = await this.request(`auth/token`, data, "post");
     this.token = await res.token
-    return await res
+    return res
   }
 
 
