@@ -1,16 +1,18 @@
 import React, { useContext } from "react";
+import { Container } from "react-bootstrap";
 import UserContext from "../userContext";
+import PodcastCard from "./PodcastCard";
 
-function PodcastList() {
+function PodcastList({podcasts}) {
   const {user} = useContext(UserContext);
-  if (user.username) {
-    return (
-      <h1>Welcome back, {user.firstName}!</h1>
-    )
-  }
-  return <div>
-    <h1>Welcome to Jobly</h1>
-  </div>
+
+  const pods = podcasts? (podcasts.map(pod => <PodcastCard podcast={pod} key={pod.id}/>)): null
+
+  return <Container>
+    <ul>
+      {pods}
+    </ul>
+  </Container>
 }
 
 export default PodcastList

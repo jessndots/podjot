@@ -95,14 +95,16 @@ class PodcastApi {
   }
 
   /** Save podcast with user notes, rating, etc */
-  static async savePodcast(data) {
+  static async savePodcast(d) {
+    const data = {username: d.username, podcastId: d.podcastId, data: {rating: d.rating, notes: d.notes}}
     let res = await this.request(`podcasts`, data, "post");
     return res.podcast
   }
 
   /** Edit user's saved podcast details */
-  static async editSavedPodcast(podcastId, newData) {
-    let res = await this.request(`podcasts/${podcastId}`, newData, "patch");
+  static async editSavedPodcast(d) {
+    const newData = {rating: d.rating, notes: d.notes};
+    let res = await this.request(`podcasts/${d.podcastId}`, newData, "patch");
     return res.podcast
   }
 

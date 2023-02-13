@@ -15,7 +15,6 @@ function UserReadWrite() {
     // on start, set token to whatever is in LS
     if (tokenInLS && !user.username) {
       setToken(tokenInLS);
-      console.log('checking local storage');
     } 
   // eslint-disable-next-line
   }, [])

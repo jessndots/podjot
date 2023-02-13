@@ -1,19 +1,20 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../userContext";
+import { Container, Form, Button } from "react-bootstrap";
 
 function Profile({ editProfile }) {
   const { user } = useContext(UserContext);
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [isBeingEdited, setIsBeingEdited] = useState(false);
   const [oldUsername, setOldUsername] = useState("")
   const [formData, setFormData] = useState({firstName: user.firstName, lastName: user.lastName, email: user.email, password: user.password})
 
   useEffect(() => {
-    if (!user.username) {
-      history.push("/login")
+    if (!user) {
+      navigate("/login")
     }
-  }, [user, history])
+  }, [user, navigate])
 
 
   const edit = () => {
@@ -30,44 +31,47 @@ function Profile({ editProfile }) {
     evt.preventDefault();
     editProfile(oldUsername, formData);
     setIsBeingEdited(false);
-    history.push("/profile")
+    navigate("/profile")
   }
 
   
   return (
-    <div>
+    <Container className="p-5">
       {isBeingEdited ? (
         <div>
           <h1>Profile</h1 >
-          <form onSubmit={handleSubmit} data-testid="form">
+          <Form onSubmit={handleSubmit} data-testid="form">
             <p>Username: {user.username} <br/><i>Username can not be changed.</i></p>
 
-            <label htmlFor="firstName" id="firstName">First Name: </label>
-            <input type="text" aria-labelledby="firstName" name="firstName" defaultValue={user.firstName} onChange={handleChange}></input><br/>
+            <Form.Label htmlFor="firstName" id="firstName">First Name: </Form.Label>
+            <Form.Control type="text" aria-labelledby="firstName" name="firstName" defaultValue={user.firstName} onChange={handleChange}/><br/>
 
-            <label htmlFor="lastName">Last Name: </label>
-            <input type="text" name="lastName" defaultValue={user.lastName} onChange={handleChange}></input><br/>
+            <Form.Label htmlFor="lastName">Last Name: </Form.Label>
+            <Form.Control type="text" name="lastName" defaultValue={user.lastName} onChange={handleChange} /><br/>
 
-            <label htmlFor="email">Email Address: </label>
-            <input type="text" name="email" defaultValue={user.email} onChange={handleChange}></input><br/>
+            <Form.Label htmlFor="email">Email Address: </Form.Label>
+            <Form.Control type="text" name="email" defaultValue={user.email} onChange={handleChange} /><br/>
 
-            <label htmlFor="password">New Password</label>
-            <input type="password" name="password" onChange={handleChange}></input><br/>
+            <Form.Label htmlFor="password">New Password</Form.Label>
+            <Form.Control type="password" name="password" onChange={handleChange} /><br/>
 
-            <button type="submit">Save Changes</button>
-            <button onClick={edit}>Cancel Changes</button>
-          </form>
+            <Button type="submit">Save Changes</Button>
+            <Button onClick={edit}>Cancel Changes</Button>
+          </Form>
         </div>
       ): (
         <div>
-          <h1>Profile<button onClick={edit}>Edit</button></h1 >
+          <div className="d-flex justify-content-between">
+            <h1>Profile</h1 >
+            <Button onClick={edit}>Edit</Button>
+          </div>
           <p>Username: {user.username}</p>
           <p>First Name: {user.firstName}</p>
           <p>Last Name: {user.lastName}</p>
           <p>Email Address: {user.email}</p>
         </div>)}
 
-    </div >
+    </Container >
   )
 }
 

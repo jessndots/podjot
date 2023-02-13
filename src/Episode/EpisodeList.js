@@ -1,16 +1,21 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import UserContext from "../userContext";
+import { Container } from "react-bootstrap";
+import EpisodeCard from "./EpisodeCard"
 
-function EpisodeList() {
+function EpisodeList({episodes, isDetailed}) {
   const {user} = useContext(UserContext);
-  if (user.username) {
-    return (
-      <h1>Welcome back, {user.firstName}!</h1>
-    )
-  }
-  return <div>
-    <h1>Welcome to Jobly</h1>
-  </div>
+  const [cards, setCards] = useState([])
+  
+  useEffect(() => {
+    if (episodes) {
+      setCards(episodes.map(episode => <EpisodeCard episode={episode} isDetailed={isDetailed} key={episode.id}  />))
+    }
+  }, [episodes])
+
+  return <Container>
+    {cards}
+  </Container>
 }
 
 export default EpisodeList
