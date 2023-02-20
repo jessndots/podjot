@@ -1,25 +1,21 @@
 import React, { useState, useContext } from 'react';
-import { Route, Routes, Redirect, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
-import UserContext from './userContext';
-import NavBar from './NavBar/NavBar';
-import Home from './Home/Home';
-import Episode from './Episode/Episode';
-import EpisodeList from './Episode/EpisodeList';
-import Podcast from './Podcast/Podcast';
-import PodcastList from './Podcast/PodcastList';
-import Profile from './Profile/Profile';
-import LogInForm from './LogInForm/LogInForm';
-import SignUpForm from './SignUpForm/SignUpForm';
-import PodJotApi from './api';
-import Search from './Search/Search.js'
+import UserProvider from './userContext';
+import NavBar from './components/NavBar/NavBar';
+import Home from './pages/Home/Home';
+import Episode from './pages/Episode/Episode';
+import Podcast from './pages/Podcast/Podcast';
+import Profile from './pages/Profile/Profile';
+import LogInForm from './pages/LogInForm/LogInForm';
+import SignUpForm from './pages/SignUpForm/SignUpForm';
+import Search from './pages/Search/Search';
 import { Container } from 'react-bootstrap';
-import listenApi from './api-podcasts';
+import listenApi from './api/listenApi';
+import podjotApi from './api/podjotApi';
 
 function App() {
-  const { user, setUser, token, setToken } = useContext(UserContext);
-  const [podcasts, setPodcasts] = useState([]);
-  const [episodes, setEpisodes] = useState([]);
+  const { setToken } = useContext(UserProvider);
   const [searchResults, setSearchResults] = useState({});
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -29,7 +25,7 @@ function App() {
   const signUpUser = (formData) => {
     async function signUp(data) {
       try {
-        const res = await PodJotApi.signUpUser(data);
+        const res = await podjotApi.signUpUser(data);
         setToken(res);
         return res
       } catch (err) {
@@ -41,7 +37,7 @@ function App() {
 
   const logInUser = async (formData) => {
     try {
-      const res = await PodJotApi.logInUser(formData);
+      const res = await podjotApi.logInUser(formData);
       setToken(res.token);
       return res
     } catch(err) {
@@ -53,7 +49,7 @@ function App() {
   const logOutUser = () => {
     async function logOut() {
       setToken("");
-      PodJotApi.token = null;
+      podjotApi.token = null;
       navigate("/")
     }
     logOut();
@@ -76,7 +72,6 @@ function App() {
         <Routes>
           <Route path="/podcasts/:podcastId/episodes/:episodeId" element={<Episode />} />
           <Route path="/podcasts/:podcastId" element={<Podcast />} />
-          <Route path="/podcasts" element={<PodcastList />} />
           <Route path="/search" element={<Search results={searchResults} query={searchQuery}/>} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<LogInForm logIn={logInUser} />} />
