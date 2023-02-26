@@ -28,58 +28,57 @@ function EpisodeCard({episode, isDetailed}) {
     return `${hours}:${minutes}:${seconds}`
   }
 
-  // removes all but the first p element for the truncated description
+  // removes all but the first element in the description for the truncated description
   const parseDescription = (d) => {
     return parse(d, {
       replace: domNode => {
         if (!!domNode.prev) {
-          return <></>
+          return <b></b>
         }
       }
     });
   }
 
 
-  return <div><Card style={{maxWidth: '600px'}}>
+  return <div><Card className="border border-dark" >
     <Card.Body>
       {isDetailed? (<>
-        <div className="d-flex justify-content-between">
-          <div>
-            <Card.Title>{parse(episode.title_highlighted || episode.title || episode.title_original)}</Card.Title>
-            <br />
-            <Card.Subtitle>{episode.podcast? (parse(episode.podcast.title_highlighted) || episode.podcast.title || episode.podcast.title_original): null}</Card.Subtitle><br />
+        <div className="d-flex justify-content-between mb-4">
+          <div className="flex-grow-1">
+            <Card.Title className="mb-3">{parse(episode.title_highlighted || episode.title || episode.title_original)}</Card.Title>
+            <Card.Subtitle className="mb-2">{episode.podcast? (parse(episode.podcast.title_highlighted) || episode.podcast.title || episode.podcast.title_original): null}</Card.Subtitle>
+            <Card.Text className="mb-2">By {episode.podcast?  (episode.podcast.publisher || episode.podcast.publisher_original): null}</Card.Text>
+            <br/>
             <div className="d-flex justify-content-between">
               <Card.Subtitle className="fw-light">{getYear(episode.pub_date_ms)}</Card.Subtitle>
               <Card.Subtitle className="fw-light">{getTime(episode.audio_length_sec)}</Card.Subtitle>
             </div>
-            <br />
           </div>
-          <div className="ms-2">
-            <img src={episode.thumbnail} alt={`Episode thumbnail`} style={{width:"130px", height:"130px"}} />
+          <div className="ms-3">
+            <img src={episode.thumbnail} alt={`Episode thumbnail`} style={{width:"150px", height:"150px"}} />
           </div>
         </div>
       </>
       ): (<>
-        <div className="d-flex justify-content-between">
-          <div>
+        <div className="d-flex justify-content-between mb-4 flex-grow-1">
+          <div className="flex-grow-1">
             <Card.Title>{parse(episode.title_highlighted || episode.title || episode.title_original)}</Card.Title>
             <br />
-            <div className="d-flex justify-content-between"> 
+            <div className="d-flex justify-content-between" > 
               <Card.Subtitle className="fw-light">{getYear(episode.pub_date_ms)}</Card.Subtitle>
               <Card.Subtitle className="fw-light">{getTime(episode.audio_length_sec)}</Card.Subtitle>
             </div>
             <br/>
           </div>
-          <div className="ms-2">
-            <img src={episode.thumbnail} alt='Episode thumbnail' style={{width:"130px", height:"130px"}} />
+          <div className="ms-3">
+            <img src={episode.thumbnail} alt='Episode thumbnail' style={{width:"150px", height:"150px"}} />
           </div>
         </div>
         </>)
       }
-      <br />
       <div className="d-block">
         {episode? (
-          <Card.Text id='card-description' className="text-break line-clamp">{parseDescription(episode.description || episode.description_original)}</Card.Text>
+          <div id='card-description' className="text-break line-clamp">{parseDescription(episode.description || episode.description_original)}</div>
         ): null}
       </div>
       <a href={`/podcasts/${podcastId}/episodes/${episode.id}`} className="stretched-link"></a>

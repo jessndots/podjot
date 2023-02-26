@@ -11,8 +11,6 @@ const {
 } = require("../expressError");
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
-const { key } = require("../api-key.js")
-const client = Client({ apiKey: key });
 
 const {dbCheckUser, dbCheckUserWithPassword, dbCheckPodcast, apiCheckPodcast, apiCheckEpisode} = require("../helpers/preChecks")
 

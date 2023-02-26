@@ -19,6 +19,7 @@ function Search() {
         params[key] = value;
       });
       const resp = await listenApi.search(params)
+      setSearchObject(params)
       setResults(resp.data.results)
     }
     getResults();
@@ -53,7 +54,7 @@ function Search() {
             label='Episodes'
             name="type"
             value="episode"
-            defaultChecked={searchObject.type === 'episode'? true: false}
+            defaultChecked={searchParams.get('type') === 'episode'? true: false}
           />
           <Form.Check 
             type='radio'
@@ -61,7 +62,7 @@ function Search() {
             label='Podcasts'
             name="type"
             value="podcast"
-            defaultChecked={searchObject.type === 'podcast'? true: false}
+            defaultChecked={searchParams.get('type') === 'podcast'? true: false}
           />
         </Form.Group>
         <Button variant="primary" type="submit">
@@ -70,10 +71,10 @@ function Search() {
       </Form>
     </Container>
     <br/>
-    {searchParams.get('type')==='episode'? (
-        <EpisodeList isDetailed={true} episodes={results} />
-    ): (
+    {searchParams.get('type')==='podcast'? (
         <PodcastList podcasts={results }/>
+    ): (
+      <EpisodeList isDetailed={true} episodes={results} />
     )}
 
 

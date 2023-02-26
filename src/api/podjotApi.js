@@ -26,7 +26,7 @@ class podjotApi {
     try {
       return (await axios({ url, method, data, params, headers })).data;
     } catch (err) {
-      console.error("API Error:", err.response);
+      console.error("API Error:", err);
       let message = err.response.data.error.message;
       throw Array.isArray(message) ? message : [message];
     }
@@ -130,14 +130,16 @@ class podjotApi {
   }
 
   /** Save episode with user notes, rating, etc */
-  static async saveEpisode(data) {
+  static async saveEpisode(d) {
+    const data = {username: d.username, episodeId: d.episodeId, data: {rating: d.rating, notes: d.notes}}
     let res = await this.request(`episodes`, data, "post");
     return res.episode
   }
 
   /** Edit user's saved episode details */
-  static async editSavedEpisode(episodeId, newData) {
-    let res = await this.request(`episodes/${episodeId}`, newData, "patch");
+  static async editSavedEpisode(d) {
+    const newData = {rating: d.rating, notes: d.notes};
+    let res = await this.request(`episodes/${d.episodeId}`, newData, "patch");
     return res.episode
   }
 

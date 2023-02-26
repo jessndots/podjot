@@ -41,7 +41,6 @@ function LogInForm({ logIn }) {
         setErrors({other: res.errors})
       }
     } 
-    console.log(newErrors)
     setValidated(true);
   }
 
@@ -55,7 +54,6 @@ function LogInForm({ logIn }) {
 
     // password errors
     if ( !password || password === '' ) newErrors.password = 'Password is required to log in'
-    console.log(newErrors);
     return newErrors
   }
 

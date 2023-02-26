@@ -28,24 +28,26 @@ function ActionCard({ media, type }) {
         if (save.notes) setNotes(save.notes);
         setIsSaved(true);
       } catch(err) {
+        console.error('err in useeffect', err)
         setIsSaved(false)
       }
     }
-    if (user.username) fetchNotes();
+    if (user.username && media.id) fetchNotes();
   }, [user, media, type])
 
   // save podcast/episode with rating and notes
   async function save(r, n) {
     try {
-      const data = {username: user.username, podcastId: media.id, rating: r, notes: n}
-      if (type === 'podcast'){
+      if (type === 'podcast') {
+        const data = {username: user.username, podcastId: media.id, rating: r, notes: n}
         if (isSaved) {
           await podjotApi.editSavedPodcast(data)
         } else {
           await podjotApi.savePodcast(data)
         }
-      }
+      } 
       if (type === 'episode') {
+        const data = {username: user.username, episodeId: media.id, rating: r, notes: n}
         if (isSaved) {
           await podjotApi.editSavedEpisode(data)
         } else {
@@ -53,9 +55,8 @@ function ActionCard({ media, type }) {
         }
       }
       setIsSaved(true);
-
     } catch(err) {
-      console.error(err);
+      console.error('err in save func', err);
     }
   }
 

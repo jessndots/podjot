@@ -1,4 +1,4 @@
-.line-clamp p {
+.line-clamp {
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;

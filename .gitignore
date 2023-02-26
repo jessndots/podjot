@@ -1,2 +1,4 @@
 /node_modules
-
+/backend/db-password
+/backend/api-key
+/src/api/listenApi
