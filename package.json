@@ -52,7 +52,7 @@
     "not op_mini all"
   ],
   "engines": {
-    "node": "19.x"
+    "node": "18"
   },
   "devDependencies": {
     "babel-core": "^7.0.0-bridge.0"
