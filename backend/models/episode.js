@@ -7,7 +7,6 @@ const {
   BadRequestError,
 } = require("../expressError");
 
-const { key } = require("../api-key.js")
 
 const {dbCheckUser, dbCheckEpisode, dbCheckEpisodeTag} = require("../helpers/preChecks")
 
@@ -21,17 +20,17 @@ class Episode {
    * - episode_id: episode id from api
    * - data: rating, note, time paused, date listened 
    **/
-   static async saveEpisode(username, episodeId, data={rating: null, notes: null, dateListened: null, timeStopped: null}) {
+   static async saveEpisode(username, episodeId, data={rating: null, notes: null, favorite: false, dateListened: null, timeStopped: null}) {
     const userInDb = await dbCheckUser(username);
     if (!userInDb) throw new NotFoundError(`User not found: ${username}`)
     const episodeInDb = await dbCheckEpisode(username, episodeId);
     if (episodeInDb) throw new BadRequestError(`User already saved episode`);
     const results = await db.query(
         `INSERT INTO user_episodes
-        (username, episode_id, rating, notes, date_listened, time_stopped)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes`, 
-        [username, episodeId, data.rating, data.notes, data.dateListened, data.timeStopped]
+        (username, episode_id, rating, notes, favorite, date_listened, time_stopped)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, favorite, notes`, 
+        [username, episodeId, data.rating, data.notes, data.favorite, data.dateListened, data.timeStopped]
     )
     const saved = results.rows[0];
     if (!saved) throw new BadRequestError(`Something went wrong. Could not save episode.`)
@@ -44,24 +43,12 @@ class Episode {
   */
   static async getSavedEpisode(username, episodeId) {
     const results = await db.query(`
-      SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes
+      SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes, favorite
       FROM user_episodes
       WHERE username = $1 AND episode_id = $2`, [username, episodeId])
     const savedPod = results.rows[0];
     if (!savedPod) throw new NotFoundError(`User has not saved this episode.`);
 
-    // get tags for episode
-    const tags = await db.query(`
-      SELECT tag 
-      FROM episode_tags
-      WHERE username = $1 AND episode_id = $2
-    `, [username, episodeId])
-    if(tags.rows.length > 0) {
-      const mapped = tags.rows.map(tagObject => tagObject.tag)
-      savedPod.tags = mapped;
-    } else {
-      savedPod.tags = [];
-    }
     return savedPod
   }
 
@@ -73,7 +60,7 @@ class Episode {
     if (!user) throw new NotFoundError(`No user with username: ${username}`)
     if (searchQuery) {
       const results = await db.query(`
-        SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes
+        SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes, favorite
         FROM user_episodes
         WHERE username = $1 AND notes LIKE $2
         `, [username, `%${searchQuery}%`]);
@@ -81,7 +68,7 @@ class Episode {
       return eps
     }
     const results = await db.query(`
-        SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes
+        SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes, favorite
         FROM user_episodes
         WHERE username = $1`, [username])
     const savedEps = results.rows;
@@ -89,6 +76,33 @@ class Episode {
  
   }
 
+  /** Get all favorite episodess saved by current user, returns list of episodes with details
+   * username: of current user
+   */
+  static async getFavoriteEpisodes(username) {
+    const user = await dbCheckUser(username);
+    if (!user) throw new NotFoundError(`No user with username: ${username}`)
+    const results = await db.query(`
+        SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes, favorite
+        FROM user_episodes
+        WHERE username = $1 AND favorite = true`, [username])
+    const savedPods = results.rows;
+    return savedPods
+  }
+
+  /** Get all episodes with notes saved by current user , returns list of episodes with details
+   * username: of current user
+   */
+  static async getEpisodesWithNotes(username) {
+    const user = await dbCheckUser(username);
+    if (!user) throw new NotFoundError(`No user with username: ${username}`)
+    const results = await db.query(`
+        SELECT username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes, favorite
+        FROM user_episodes
+        WHERE username = $1 AND notes IS NOT NULL`, [username])
+    const savedEps = results.rows;
+    return savedEps
+  }
 
   /** Update episode: update user_episodes, returns Saved message.
    *
@@ -107,13 +121,14 @@ class Episode {
         timeStopped: "time_stopped",
         rating: "rating",
         notes: "notes",
+        favorite: "favorite"
       });
     const usernameVarIdx = "$" + (values.length + 1);
     const episodeIdVarIdx = "$" + (values.length + 2);
     const querySql = `UPDATE user_episodes
                       SET ${setCols} 
                       WHERE username = ${usernameVarIdx} AND episode_id = ${episodeIdVarIdx}
-                      RETURNING username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes`
+                      RETURNING username, episode_id AS "episodeId", date_listened AS "dateListened", time_stopped AS "timeStopped", rating, notes, favorite`
     const result = await db.query(querySql, [...values, username, episodeId]);
     const saved = result.rows[0];
     if (!saved) throw new BadRequestError(`Something went wrong. Could not save episode.`)
@@ -198,6 +213,7 @@ class Episode {
     if (results.rows.length === 0) throw new NotFoundError('User has not saved any episodes with this tag.');
     return eps
   }
+
 }
 
 module.exports = Episode

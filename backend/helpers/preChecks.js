@@ -1,7 +1,6 @@
 const db = require("../db");
 const { Client } = require('podcast-api');
-const { key } = require("../api-key.js")
-const client = Client({ apiKey: key });
+const client = Client({ apiKey: process.env.REACT_APP_API_KEY });
 
 const dbCheckUser = async (username) => {
   const check = await db.query(

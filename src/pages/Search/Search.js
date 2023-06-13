@@ -8,8 +8,8 @@ import PodcastList from "../../components/PodcastList/PodcastList"
 function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [results, setResults] = useState()
-
-  const [searchObject, setSearchObject] = useState({q: "", type: "episode"});
+  const [searchObject, setSearchObject] = useState({ q: "", type: "episode" });
+  const [page, setPage] = useState(1)
 
   // on load, grab search params and send to listenApi
   useEffect(() => {
@@ -20,7 +20,9 @@ function Search() {
       });
       const resp = await listenApi.search(params)
       setSearchObject(params)
-      setResults(resp.data.results)
+      if (resp.data.results) {
+        setResults(resp.data)
+      }
     }
     getResults();
   }, [searchParams])
@@ -36,33 +38,47 @@ function Search() {
     setSearchParams(createSearchParams(searchObject))
   }
 
+  const nextPage = function () {
+    if (results && results.next_offset) {
+      setPage(page => page + 1)
+      setSearchObject({...searchObject, offset: results.next_offset})
+      setSearchParams(createSearchParams({...searchObject, offset: results.next_offset}))
+    }
+  }
 
+  const prevPage = function () {
+    if (results) {
+      setPage(page => page - 1);
+      setSearchObject({...searchObject, offset: Math.max(0, results.next_offset-20)})
+      setSearchParams(createSearchParams({...searchObject, offset: Math.max(0, results.next_offset-20)}))
+    }
+  }
 
   return <Container className="p-5">
     <h1>Results for {`"${searchParams.get('q')}"`}</h1>
     <Container fluid>
-      <Form  onSubmit={handleSubmit} >
+      <Form onSubmit={handleSubmit} >
         <Form.Group className="mb-3" controlId="formSearch">
           <Form.Label>Search Term</Form.Label>
           <Form.Control type="string" onChange={handleChange} name="q" default={searchObject.q || searchParams.get('q')} />
         </Form.Group>
         <Form.Group className="mb-3" controlId="formType" onChange={handleChange}>
           <Form.Label>Search for...</Form.Label>
-          <Form.Check 
+          <Form.Check
             type='radio'
             id='type-episodes'
             label='Episodes'
             name="type"
             value="episode"
-            defaultChecked={searchParams.get('type') === 'episode'? true: false}
+            defaultChecked={searchParams.get('type') === 'episode' ? true : false}
           />
-          <Form.Check 
+          <Form.Check
             type='radio'
             id='type-podcasts'
             label='Podcasts'
             name="type"
             value="podcast"
-            defaultChecked={searchParams.get('type') === 'podcast'? true: false}
+            defaultChecked={searchParams.get('type') === 'podcast' ? true : false}
           />
         </Form.Group>
         <Button variant="primary" type="submit">
@@ -70,14 +86,39 @@ function Search() {
         </Button>
       </Form>
     </Container>
-    <br/>
-    {searchParams.get('type')==='podcast'? (
-        <PodcastList podcasts={results }/>
-    ): (
-      <EpisodeList isDetailed={true} episodes={results} />
+    <br />
+    {searchParams.get('type') === 'podcast' ? (
+      <PodcastList podcasts={results? results.results : null} />
+    ) : (
+      <EpisodeList isDetailed={true} episodes={results? results.results : null} />
     )}
 
+    <nav aria-label="...">
+      <ul class="pagination">
+        {page === 1 ? (
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          </li>
+        ) : (
+          <li class="page-item">
+            <button class="page-link" onClick={prevPage}>Previous</button>
+          </li>
+        )}
+        <li class="page-item active">
+          <button class="page-link" href="#">{page} <span class="sr-only"></span></button>
+        </li>
+        {results && results.results.length === 10 && results.next_offset? (
+          <li class="page-item">
+            <button class="page-link" onClick={nextPage}>Next</button>
+          </li>
+        ) : (
+          <li class="page-item disabled">
+            <button class="page-link">Next</button>
+          </li>
+        )}
 
+      </ul>
+    </nav>
   </Container>
 }
 

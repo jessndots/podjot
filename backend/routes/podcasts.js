@@ -19,9 +19,9 @@ const router = new express.Router();
 
 /** POST / { podcast } =>  { podcast }
  *
- * podcast should be { username, podcastId, dateAdded, rating, notes }
+ * podcast should be { username, podcastId, dateAdded, rating, notes, favorite }
  *
- * Returns { username, podcastId, dateAdded, rating, notes }
+ * Returns { username, podcastId, dateAdded, rating, notes, favorite }
  *
  * Authorization required: admin
  */
@@ -68,9 +68,49 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
+/** GET /favorites  =>
+ *   { podcasts: [ { username, podcastId, dateAdded, rating, notes }, ...] }
+ *
+ * Fetches user favorite podcasts
+ *
+ * Authorization required: logged in
+ */
+
+router.get("/favorites", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const username = res.locals.user.username
+    const podcasts = await Podcast.getFavoritePodcasts(username);
+    console.log('favPods from db model', podcasts)
+    if (podcasts.length === 0) throw new NotFoundError('No favorited podcasts found.')
+    
+    return res.json({ podcasts });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /notes  =>
+ *   { podcasts: [ { username, podcastId, dateAdded, rating, notes }, ...] }
+ *
+ * Fetches user podcasts with notes
+ *
+ * Authorization required: logged in
+ */
+
+router.get("/notes", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const username = res.locals.user.username
+    const podcasts = await Podcast.getPodcastsWithNotes(username);
+    if (podcasts.length === 0) throw new NotFoundError('No podcasts with notes found.')
+    return res.json({ podcasts });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 /** GET /[podcastId]  =>  { podcast }
  *
- *  Podcast is { username, podcastId, dateAdded, rating, notes }
+ *  Podcast is { username, podcastId, dateAdded, rating, notes, favorite }
  *   
  *  authorization required: logged in
  */
@@ -89,9 +129,9 @@ router.get("/:podcastId", ensureLoggedIn,  async function (req, res, next) {
  *
  * Patches podcast data.
  *
- * edited fields can be: { rating, notes }
+ * edited fields can be: { rating, notes, favorite }
  *
- * Returns { podcastId, username, dateAdded, rating, notes }
+ * Returns { podcastId, username, dateAdded, rating, notes, favorite }
  *
  * Authorization required: admin or matching user
  */

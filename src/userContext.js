@@ -35,11 +35,10 @@ function UserProvider() {
       fetchUser(token);
     // if user and empty token, complete logout by clearing LS and user context
     } else if (!token && user.username) {
-      console.log("UserContext - setting user to blank object")
       setUser({});
       setTokenInLS("")
     }
-  // eslint-disable-next-line
+  // eslint-disable-next-line+
   }, [token])
 
 

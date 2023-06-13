@@ -13,6 +13,7 @@ import Search from './pages/Search/Search';
 import { Container } from 'react-bootstrap';
 import listenApi from './api/listenApi';
 import podjotApi from './api/podjotApi';
+import MyPodcasts from './pages/MyPodcasts/MyPodcasts';
 
 function App() {
   const { setToken } = useContext(UserProvider);
@@ -73,6 +74,7 @@ function App() {
           <Route path="/podcasts/:podcastId/episodes/:episodeId" element={<Episode />} />
           <Route path="/podcasts/:podcastId" element={<Podcast />} />
           <Route path="/search" element={<Search results={searchResults} query={searchQuery}/>} />
+          <Route path="/mypodcasts" element={<MyPodcasts />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<LogInForm logIn={logInUser} />} />
           <Route path="/signup" element={<SignUpForm signUp={signUpUser} />} />

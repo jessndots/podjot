@@ -22,6 +22,9 @@
       "notes": {
         "type": "string"
       }, 
+      "favorite": {
+        "type": "boolean"
+      },
       "dateListened": {
         "type": "string", 
         "format": "date"

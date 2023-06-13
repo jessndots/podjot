@@ -21,6 +21,9 @@
       },
       "notes": {
         "type": "string"
+      },
+      "favorite": {
+        "type": "boolean"
       }
     }
   },

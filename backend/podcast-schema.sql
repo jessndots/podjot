@@ -27,6 +27,7 @@ CREATE TABLE user_episodes (
   episode_id varchar NOT NULL,
   date_listened date,
   time_stopped time,
+  favorite boolean,
   rating integer CHECK (rating <= 5),
   notes text, 
   PRIMARY KEY (username, episode_id)
@@ -36,6 +37,7 @@ CREATE TABLE user_podcasts (
   username varchar NOT NULL,
   podcast_id varchar NOT NULL,
   date_added date NOT NULL DEFAULT 'now()',
+  favorite boolean,
   rating integer CHECK (rating <= 5),
   notes text, 
   PRIMARY KEY (username, podcast_id)

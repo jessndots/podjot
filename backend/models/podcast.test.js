@@ -24,8 +24,8 @@ afterAll(async () => {await commonAfterAll()}, 2000);
 describe("save podcast", function () {
 
   test("works", async function () {
-    let saved = await Podcast.savePodcast('user1', '55', {rating: 5, notes: "note"});
-    expect(saved).toEqual({username: 'user1', podcastId: '55', dateAdded: expect.any(Date), rating: 5, notes: 'note'});
+    let saved = await Podcast.savePodcast('user1', '55', {rating: 5, notes: "note", favorite: true});
+    expect(saved).toEqual({username: 'user1', podcastId: '55', dateAdded: expect.any(Date), rating: 5, notes: 'note', favorite: true});
   });
 
   test("bad request with dup data", async function () {
@@ -76,8 +76,8 @@ describe("get all user's saved podcasts", function() {
     const podcasts = await Podcast.getAllSavedPodcasts('user1');
     expect(podcasts.length).toBe(2)
     expect(podcasts).toEqual([
-      {notes: "notes 1", podcastId: "1", dateAdded: expect.any(Date), rating: 5, username: "user1"},
-      {username: "user1", podcastId: "2", dateAdded: expect.any(Date), rating: 4, notes: "notes 2"}
+      {notes: "notes 1", podcastId: "1", dateAdded: expect.any(Date), rating: 5, username: "user1", favorite: false},
+      {username: "user1", podcastId: "2", dateAdded: expect.any(Date), rating: 4, notes: "notes 2", favorite: false}
     ]);
   })
 

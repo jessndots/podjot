@@ -2,7 +2,7 @@
 /** Database setup for podcast app. */
 const { Client } = require("pg");
 const { getDatabaseUri } = require("./config");
-const {password} = require("./db-password")
+const password = require("./db-password")
 
 let db;
 

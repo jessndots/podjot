@@ -41,7 +41,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 });
 
 /** GET /  =>
- *   { episodes: [ { username, episodeId, dateAdded, rating, notes }, ...] }
+ *   { episodes: [ { username, episodeId, dateAdded, rating, notes, favorite }, ...] }
  *
  * Can provide search term to filter results
  *
@@ -66,9 +66,49 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
+/** GET /favorites  =>
+ *   { episodes: [ { username, episodeId, dateAdded, rating, notes, favorite }, ...] }
+ *
+ * Fetches favorited episodes
+ *
+ * Authorization required: logged in
+ */
+
+router.get("/favorites", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const username = res.locals.user.username
+    const episodes = await Episode.getFavoriteEpisodes(username);
+    if (episodes.length === 0) throw new NotFoundError('No favorited episodes found.')
+    
+    return res.json({ episodes: episodes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /notes  =>
+ *   { episodes: [ { username, episodeId, dateAdded, rating, notes, favorite }, ...] }
+ *
+ * Fetches episodes with notes
+ *
+ * Authorization required: logged in
+ */
+
+router.get("/notes", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const username = res.locals.user.username
+    const episodes = await Episode.getEpisodesWithNotes(username);
+    console.log(episodes)
+    if (episodes.length === 0) throw new NotFoundError('No episodes with notes found.')
+    return res.json({ episodes: episodes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 /** GET /[episodeId]  =>  { episode }
  *
- *  Episode is { username, episodeId, dateAdded, rating, notes }
+ *  Episode is { username, episodeId, dateAdded, rating, notes, favorite }
  *   
  *  authorization required: logged in
  */
@@ -87,9 +127,9 @@ router.get("/:episodeId", ensureLoggedIn,  async function (req, res, next) {
  *
  * Patches episode data.
  *
- * edited fields can be: { rating, notes }
+ * edited fields can be: { rating, notes, favorite }
  *
- * Returns { episodeId, username, dateAdded, rating, notes }
+ * Returns { episodeId, username, dateAdded, rating, notes, favorite }
  *
  * Authorization required: admin or matching user
  */

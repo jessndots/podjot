@@ -1,8 +1,9 @@
 import React from "react";
 import {render, fireEvent} from "@testing-library/react"
 import NavBar from "./NavBar";
-import UserContext from "../userContext";
+import UserContext from "../../userContext";
 import { createMemoryHistory } from "history";
+import '@testing-library/jest-dom'
 
 import { MemoryRouter, Router} from 'react-router-dom';
 
@@ -11,15 +12,15 @@ const pushMock = jest.fn();
 it("NavBar shows login and sign up links for anon user", function(){
   const user = {username: ""};
   const {getByText} = render(<MemoryRouter><UserContext.Provider value={{user}}><NavBar /></UserContext.Provider></MemoryRouter>);
-  expect(getByText("Log in")).toBeInTheDocument();
-  expect(getByText("Sign up")).toBeInTheDocument();
+  expect(getByText("Log In")).toBeInTheDocument();
+  expect(getByText("Sign Up")).toBeInTheDocument();
 })
 
 it("NavBar shows username link and log out button for logged in user", function(){
   const user = {username: "username", firstName: "first name"};
   const {getByText} = render(<MemoryRouter><UserContext.Provider value={{user}}><NavBar /></UserContext.Provider></MemoryRouter>);
-  expect(getByText("username")).toBeInTheDocument();
-  expect(getByText("Log out")).toBeInTheDocument();
+  expect(getByText("Account")).toBeInTheDocument();
+  expect(getByText("Log Out")).toBeInTheDocument();
 })
 
 it("log out button works", function(){
@@ -28,7 +29,7 @@ it("log out button works", function(){
 
   const user = {username: "username", firstName: "first name"};
   const {getByText} = render(<MemoryRouter><UserContext.Provider value={{user}}><NavBar logOut={mockLogOut}/></UserContext.Provider></MemoryRouter>);
-  const logOutButton = getByText("Log out");
+  const logOutButton = getByText("Log Out");
 
   // check if logged in
   expect(logOutButton).toBeInTheDocument();
@@ -43,23 +44,18 @@ it("log out button works", function(){
 it("nav links work for logged in user", function() {
   const history = createMemoryHistory();
   const user = {username: "username", firstName: "first name"};
-
-  const {getByText} = render(<Router history={history}><UserContext.Provider value={{user}}><NavBar /></UserContext.Provider></Router>);
+  const mockLogOut = jest.fn()
+  history.push = jest.fn();
+  
+  const {getByText} = render(<MemoryRouter history={history}><UserContext.Provider value={{user}}><NavBar logOut={mockLogOut}/></UserContext.Provider></MemoryRouter>);
 
   // home link
-  fireEvent.click(getByText("Jobly"));
+  fireEvent.click(getByText("PodJot"));
   expect(history.location.pathname).toBe("/");
 
-  // companies link
-  fireEvent.click(getByText("Companies"));
-  expect(history.location.pathname).toBe("/companies");
-
-  // jobs link
-  fireEvent.click(getByText("Jobs"));
-  expect(history.location.pathname).toBe("/jobs");
-
   // profile link
-  fireEvent.click(getByText("username"));
+  fireEvent.click(getByText("Account"));
+  expect(history.push).toHaveBeenCalledWith('/profile');
   expect(history.location.pathname).toBe("/profile");
 })
 
@@ -68,25 +64,18 @@ it("nav links work for anon user", function() {
   const history = createMemoryHistory();
   const user = {username: ""};
 
-  const {getByText} = render(<Router history={history}><UserContext.Provider value={{user}}><NavBar /></UserContext.Provider></Router>);
+  const mockLogOut = jest.fn()
+  const {getByText} = render(<MemoryRouter history={history}><UserContext.Provider value={{user}}><NavBar logOut={mockLogOut}/></UserContext.Provider></MemoryRouter>);
 
   // home link
-  fireEvent.click(getByText("Jobly"));
+  fireEvent.click(getByText("PodJot"));
   expect(history.location.pathname).toBe("/");
 
-  // companies link
-  fireEvent.click(getByText("Companies"));
-  expect(history.location.pathname).toBe("/companies");
-
-  // jobs link
-  fireEvent.click(getByText("Jobs"));
-  expect(history.location.pathname).toBe("/jobs");
-
   // login link
-  fireEvent.click(getByText("Log in"));
+  fireEvent.click(getByText("Log In"));
   expect(history.location.pathname).toBe("/login");
 
   // sign up link
-  fireEvent.click(getByText("Sign up"));
+  fireEvent.click(getByText("Sign Up"));
   expect(history.location.pathname).toBe("/signup");
 })

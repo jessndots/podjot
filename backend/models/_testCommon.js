@@ -28,16 +28,16 @@ async function commonBeforeAll() {
     ]);
 
   await db.query(`
-    INSERT INTO user_podcasts (username, podcast_id, rating, notes)
-    VALUES ('user1', '1', 5, 'notes 1'),
-    ('user1', '2', 4, 'notes 2'),
-    ('user2', '3', 2, 'notes 3')`)
+    INSERT INTO user_podcasts (username, podcast_id, rating, notes, favorite)
+    VALUES ('user1', '1', 5, 'notes 1', false),
+    ('user1', '2', 4, 'notes 2', false),
+    ('user2', '3', 2, 'notes 3', true)`)
 
   await db.query(`
-    INSERT INTO user_episodes (username, episode_id, time_stopped, rating, notes)
-    VALUES ('user1', '1', '00:02:41', 5, 'notes 1'),
-    ('user1', '2', '00:18:13', 4, 'notes 2'),
-    ('user2', '3', '00:39:02', 2, 'notes 3')`)
+    INSERT INTO user_episodes (username, episode_id, time_stopped, rating, notes, favorite)
+    VALUES ('user1', '1', '00:02:41', 5, 'notes 1', false),
+    ('user1', '2', '00:18:13', 4, 'notes 2', false),
+    ('user2', '3', '00:39:02', 2, 'notes 3', true)`)
 }
 
 async function commonBeforeEach() {

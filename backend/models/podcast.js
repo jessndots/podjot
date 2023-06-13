@@ -7,7 +7,6 @@ const {
   BadRequestError,
 } = require("../expressError");
 
-const { key } = require("../api-key.js")
 
 const { dbCheckUser, dbCheckPodcast, dbCheckPodcastTag } = require("../helpers/preChecks")
 
@@ -21,18 +20,18 @@ class Podcast {
    * - podcast_id: podcast id from api
    * - data: rating, note that user set 
    **/
-  static async savePodcast(username, podcastId, data = { rating: null, notes: null }) {
+  static async savePodcast(username, podcastId, data = { rating: null, notes: null, favorite: false }) {
     const userInDb = await dbCheckUser(username);
     if (!userInDb) throw new NotFoundError(`Could not find user: ${username}`)
     const podcastInDb = await dbCheckPodcast(username, podcastId);
     if (podcastInDb) throw new BadRequestError(`User already saved podcast`);
-
+    console.log('savePodcast data', data)
     const results = await db.query(
       `INSERT INTO user_podcasts
-        (username, podcast_id, rating, notes)
-        VALUES ($1, $2, $3, $4)
-        RETURNING username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes`,
-      [username, podcastId, data.rating, data.notes]
+        (username, podcast_id, rating, notes, favorite)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite`,
+      [username, podcastId, data.rating, data.notes, data.favorite]
     )
 
     const saved = results.rows[0];
@@ -46,7 +45,7 @@ class Podcast {
   */
   static async getSavedPodcast(username, podcastId) {
     const results = await db.query(`
-      SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes
+      SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite
       FROM user_podcasts
       WHERE podcast_id = $1 AND username = $2`, [podcastId, username])
     const savedPod = results.rows[0];
@@ -56,39 +55,63 @@ class Podcast {
 
   /** Get all podcasts saved by current user, returns list of podcasts with details
    * username: of current user
-   * TO DO: FIGURE OUT HOW TO FILTER WITH SEARCH QUERY
    */
   static async getAllSavedPodcasts(username, searchQuery) {
     const user = await dbCheckUser(username);
     if (!user) throw new NotFoundError(`No user with username: ${username}`)
     if (searchQuery) {
       const results = await db.query(`
-        SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes
+        SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite
         FROM user_podcasts
         WHERE username = $1 AND notes LIKE $2
         `, [username, `%${searchQuery}%`]);
       const pods = results.rows
       return pods
     }
-    console.log('no search query')
     const results = await db.query(`
-        SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes
+        SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite
         FROM user_podcasts
         WHERE username = $1`, [username])
     const savedPods = results.rows;
     return savedPods
-
   }
 
+  /** Get all favorite podcasts saved by current user, returns list of podcasts with details
+   * username: of current user
+   */
+    static async getFavoritePodcasts(username) {
+      const user = await dbCheckUser(username);
+      if (!user) throw new NotFoundError(`No user with username: ${username}`)
+      const results = await db.query(`
+          SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite
+          FROM user_podcasts
+          WHERE username = $1 AND favorite = 'TRUE'`, [username])
+      const savedPods = results.rows;
+      return savedPods
+    }
 
-  /** Update saved podcast: update user_podcasts, returns updated save data.
+  /** Get all podcasts with notes saved by current user , returns list of podcasts with details
+   * username: of current user
+   */
+    static async getPodcastsWithNotes(username) {
+      const user = await dbCheckUser(username);
+      if (!user) throw new NotFoundError(`No user with username: ${username}`)
+      const results = await db.query(`
+          SELECT username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite
+          FROM user_podcasts
+          WHERE username = $1 AND notes IS NOT NULL`, [username])
+      const savedPods = results.rows;
+      return savedPods
+    }
+
+    /** Update saved podcast: update user_podcasts, returns updated save data.
    *
    * - username: of current user
    * - podcastId: from api
    * - data: rating, notes 
    **/
   static async updatePodcast(username, podcastId, data) {
-    if (!data) throw new BadRequestError(`Data parameter is required. Example: {rating: 3, notes: 'example notes'} `)
+    if (!data) throw new BadRequestError(`Data parameter is required.`)
     const check = await db.query(`
       SELECT date_added
       FROM user_podcasts 
@@ -100,13 +123,14 @@ class Podcast {
       {
         rating: "rating",
         notes: "notes",
+        favorite: "favorite"
       });
     const usernameVarIdx = "$" + (values.length + 1);
     const podcastIdVarIdx = "$" + (values.length + 2);
     const querySql = `UPDATE user_podcasts
                       SET ${setCols} 
                       WHERE username = ${usernameVarIdx} AND podcast_id = ${podcastIdVarIdx}
-                      RETURNING username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes`
+                      RETURNING username, podcast_id AS "podcastId", date_added AS "dateAdded", rating, notes, favorite`
     const result = await db.query(querySql, [...values, username, podcastId]);
     const saved = result.rows[0];
     if (!saved) throw new BadRequestError(`Something went wrong. Could not save podcast.`)
@@ -180,7 +204,7 @@ class Podcast {
     if (!user) throw new NotFoundError(`No user with username: ${username}`);
 
     const results = await db.query(`
-      SELECT p.username, p.podcast_id, p.date_added, p.rating, p.notes
+      SELECT p.username, p.podcast_id, p.date_added, p.rating, p.notes, p.favorite
       FROM user_podcasts p
       JOIN podcast_tags t ON p.podcast_id = t.podcast_id
       WHERE t.tag = $1 AND t.username = $2

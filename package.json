@@ -3,20 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/preset-flow": "^7.21.4",
     "@babel/runtime": "^7.20.7",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.2.1",
+    "axios": "^1.4.0",
+    "babel-plugin-styled-components": "^2.1.1",
     "bcrypt": "^5.1.0",
     "bootstrap": "^5.2.3",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
     "history": "^5.3.0",
     "html-react-parser": "^3.0.8",
+    "jest-environment-jsdom": "^29.5.0",
     "jsonschema": "^1.4.1",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
+    "nodemon": "^2.0.22",
     "pg": "^8.8.0",
     "podcast-api": "^2.0.2",
     "react": "^18.2.0",
@@ -26,9 +32,11 @@
     "react-scripts": "5.0.1",
     "react-star-ratings": "^2.3.0",
     "resolve-pathname": "^3.0.0",
+    "shear.js": "^2.1.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "start:backend": "nodemon backend/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -45,5 +53,8 @@
   ],
   "engines": {
     "node": "19.x"
+  },
+  "devDependencies": {
+    "babel-core": "^7.0.0-bridge.0"
   }
 }

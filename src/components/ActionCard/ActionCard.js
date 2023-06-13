@@ -7,7 +7,8 @@ import podjotApi from "../../api/podjotApi"
 
 function ActionCard({ media, type }) {
   const { user } = useContext(UserContext);
-  const [isSaved, setIsSaved] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [rating, setRating] = useState();
   const [notes, setNotes] = useState()
@@ -24,22 +25,23 @@ function ActionCard({ media, type }) {
         if (type === 'episode') {
           save = await podjotApi.getSavedEpisode(media.id)
         }
+        console.log(save)
         if (save.rating) setRating(save.rating);
         if (save.notes) setNotes(save.notes);
-        setIsSaved(true);
+        if (save.favorite) setIsFavorite(save.favorite);
+        setIsSaved(true)
       } catch(err) {
-        console.error('err in useeffect', err)
         setIsSaved(false)
       }
     }
     if (user.username && media.id) fetchNotes();
   }, [user, media, type])
 
-  // save podcast/episode with rating and notes
-  async function save(r, n) {
+  // save podcast/episode with rating, favorite, and notes
+  async function save(r, n, f) {
     try {
       if (type === 'podcast') {
-        const data = {username: user.username, podcastId: media.id, rating: r, notes: n}
+        const data = {username: user.username, podcastId: media.id, rating: r, notes: n, favorite: f}
         if (isSaved) {
           await podjotApi.editSavedPodcast(data)
         } else {
@@ -47,7 +49,7 @@ function ActionCard({ media, type }) {
         }
       } 
       if (type === 'episode') {
-        const data = {username: user.username, episodeId: media.id, rating: r, notes: n}
+        const data = {username: user.username, episodeId: media.id, rating: r, notes: n, favorite: f}
         if (isSaved) {
           await podjotApi.editSavedEpisode(data)
         } else {
@@ -61,9 +63,15 @@ function ActionCard({ media, type }) {
   }
 
   // rate podcast, initiate save
-  const ratePodcast = (newRating) => {
+  const rate = (newRating) => {
     setRating(newRating);
-    save(newRating, notes);
+    save(newRating, notes, isFavorite);
+  }
+
+  // favorite / unfavorite, initiate save
+  const favorite = () => {
+    setIsFavorite(!isFavorite);
+    save(rating, notes, !isFavorite)
   }
 
   // show the notes
@@ -72,7 +80,7 @@ function ActionCard({ media, type }) {
   // close the notes and initiate save
   const handleClose = () => {
     setShowNotes(false);
-    save(rating, notes);
+    save(rating, notes, isFavorite);
   }
 
   const handleChange = (evt) => {
@@ -85,17 +93,21 @@ function ActionCard({ media, type }) {
       {user.username ? (
         <Card.Body>
           <div className="d-grid gap-2">
-            {isSaved? (
-              <Button><i className="bi bi-bookmark-fill"></i> Saved</Button>
+            {isFavorite? (
+              <Button onClick={favorite}><i className="bi bi-star-fill"></i> Favorite</Button>
             ): (
-              <Button onClick={save}><i className="bi bi-bookmark"></i> Save</Button>
+              <Button onClick={favorite}><i className="bi bi-star"></i> Favorite</Button>
             )}
-            <Button onClick={handleShow}><i className="bi bi-pencil-square"></i> Take Notes</Button><br />
+            {notes? (
+              <><Button onClick={handleShow}><i className="bi bi-pencil-square"></i> Edit Notes</Button><br /></>
+            ): (
+              <><Button onClick={handleShow}><i className="bi bi-pencil-square"></i> Take Notes</Button><br /></>
+            )}
             <Card.Subtitle>Rate</Card.Subtitle>
             <StarRatings
               rating={rating}
               numberOfStars={5}
-              changeRating={ratePodcast}
+              changeRating={rate}
               name="podRating"
               starDimension="20px"
               starSpacing="5px"
@@ -122,7 +134,8 @@ function ActionCard({ media, type }) {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Form>
-            <Form.Control onChange={handleChange} as="textarea" rows={20} placeholder="Jot down your thoughts..." value={notes} />
+            <Form.Control onChange={handleChange} as="textarea" rows={15} placeholder="Jot down your thoughts..." value={notes} />
+            <br/><Button onClick={handleClose}>Save & Close</Button>
           </Form>
         </Offcanvas.Body>
       </Offcanvas>

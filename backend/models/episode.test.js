@@ -23,8 +23,8 @@ afterAll(async () => {await commonAfterAll()}, 2000);
 /************************************** save episode */
 describe("save episode", function () {
   test("works", async function () {
-    let saved = await Episode.saveEpisode('user1', '55', {rating: 5, notes: "note", dateListened: null, timeStopped: null});
-    expect(saved).toEqual({username: 'user1', episodeId: '55', dateListened: null, timeStopped: null, rating: 5, notes: 'note'});
+    let saved = await Episode.saveEpisode('user1', '55', {rating: 5, notes: "note", favorite: true, dateListened: null, timeStopped: null});
+    expect(saved).toEqual({username: 'user1', episodeId: '55', dateListened: null, timeStopped: null, rating: 5, notes: 'note', favorite: true});
   });
 
   test("bad request with dup data", async function () {
@@ -50,24 +50,11 @@ describe("save episode", function () {
 describe("get saved episode", function() {
   test("works", async function() {
     // save an episode
-    const saved = await Episode.saveEpisode('user1', '55', {rating: 5, notes: "note"});
+    const saved = await Episode.saveEpisode('user1', '55', {rating: 5, notes: "note", favorite: false});
 
     // get that episode
     const episode = await Episode.getSavedEpisode('user1', '55');
-    expect(episode).toEqual({username: 'user1', episodeId: '55', dateListened: null, timeStopped: null, rating: 5, notes: "note", tags: []});
-  })
-
-  test("works with tags", async function() {
-    // save an episode
-    const saved = await Episode.saveEpisode('user1', '55', {rating: 5, notes: "note"});
-
-    // add tags
-    await Episode.tagEpisode('user1', '55', 'tag 1');
-    await Episode.tagEpisode('user1', '55', 'tag 2')
-
-    // get that episode
-    const episode = await Episode.getSavedEpisode('user1', '55');
-    expect(episode).toEqual({username: 'user1', episodeId: '55', dateListened: null, timeStopped: null, rating: 5, notes: "note", tags: ['tag 1', 'tag 2']});
+    expect(episode).toEqual({username: 'user1', episodeId: '55', dateListened: null, timeStopped: null, rating: 5, notes: "note", favorite: false});
   })
 
   test("bad request with unsaved ep", async function() {
@@ -142,8 +129,6 @@ describe("Update saved episode notes/rating", function() {
     }
   })
 })
-
-
 /****************************************************** unsave episode */
 describe("Remove episode save", function() {
   test("works", async function() {
@@ -152,7 +137,7 @@ describe("Remove episode save", function() {
     expect(newSave.episodeId).toEqual('999')
 
     // remove episode
-    const removed = await Episode.removeEpisode('user1', '999')
+    const removed = await Episode.removeSave('user1', '999')
     expect(removed).toEqual({Removed: '999'});
 
     // check
@@ -167,7 +152,7 @@ describe("Remove episode save", function() {
 
   test("NotFound if user had not saved ep", async function() {
     try {
-      const removed = await Episode.removeEpisode('user1', '999');
+      const removed = await Episode.removeSave('user1', '999');
       fail();
     }
     catch(err) {

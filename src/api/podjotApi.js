@@ -16,7 +16,6 @@ class podjotApi {
 
   static async request(endpoint, data = {}, method = "get") {
     console.debug("API Call:", endpoint, data, method);
-
     const url = `${BASE_URL}/${endpoint}`;
     const headers = { Authorization: `Bearer ${podjotApi.token}` };
     const params = (method === "get")
@@ -27,7 +26,10 @@ class podjotApi {
       return (await axios({ url, method, data, params, headers })).data;
     } catch (err) {
       console.error("API Error:", err);
-      let message = err.response.data.error.message;
+      if (err.response) {
+        let message = err.response.data.error.message;
+      }
+      let message = err;
       throw Array.isArray(message) ? message : [message];
     }
   }
@@ -75,6 +77,7 @@ class podjotApi {
   /** Log in user, returns token */
   static async logInUser(data) {
     let res = await this.request(`auth/token`, data, "post");
+    console.log(res.token)
     this.token = await res.token
     return res
   }
@@ -94,16 +97,33 @@ class podjotApi {
     return res.podcasts
   }
 
+  /** Get list of user's favorited podcasts */
+  static async getFavoritePodcasts() {
+    let res = await this.request(`podcasts/favorites`);
+    return res.podcasts
+  }
+
+  /** Get list of user's podcasts with notes */
+  static async getPodcastsWithNotes() {
+    try {
+      let res = await this.request(`podcasts/notes`);
+      return res.podcasts
+    } catch {
+      
+    }
+
+  }
+
   /** Save podcast with user notes, rating, etc */
   static async savePodcast(d) {
-    const data = {username: d.username, podcastId: d.podcastId, data: {rating: d.rating, notes: d.notes}}
+    const data = {username: d.username, podcastId: d.podcastId, data: {rating: d.rating, notes: d.notes, favorite: d.favorite}}
     let res = await this.request(`podcasts`, data, "post");
     return res.podcast
   }
 
   /** Edit user's saved podcast details */
   static async editSavedPodcast(d) {
-    const newData = {rating: d.rating, notes: d.notes};
+    const newData = {rating: d.rating, notes: d.notes, favorite: d.favorite};
     let res = await this.request(`podcasts/${d.podcastId}`, newData, "patch");
     return res.podcast
   }
@@ -129,16 +149,28 @@ class podjotApi {
     return res.episodes
   }
 
+  /** Get list of user's favorited episodes */
+  static async getFavoriteEpisodes() {
+    let res = await this.request(`episodes/favorites`);
+    return res.episodes
+  }
+
+  /** Get list of user's episodes with notes */
+  static async getEpisodesWithNotes() {
+    let res = await this.request(`episodes/notes`);
+    return res.episodes
+  }
+
   /** Save episode with user notes, rating, etc */
   static async saveEpisode(d) {
-    const data = {username: d.username, episodeId: d.episodeId, data: {rating: d.rating, notes: d.notes}}
+    const data = {username: d.username, episodeId: d.episodeId, data: {rating: d.rating, notes: d.notes, favorite: d.favorite}}
     let res = await this.request(`episodes`, data, "post");
     return res.episode
   }
 
   /** Edit user's saved episode details */
   static async editSavedEpisode(d) {
-    const newData = {rating: d.rating, notes: d.notes};
+    const newData = {rating: d.rating, notes: d.notes, favorite: d.favorite};
     let res = await this.request(`episodes/${d.episodeId}`, newData, "patch");
     return res.episode
   }

@@ -10,6 +10,9 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 5
+    }, 
+    "favorite": {
+      "type": "boolean"
     }
   },
   "additionalProperties": false,

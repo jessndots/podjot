@@ -38,6 +38,7 @@ function NavBar({ logOut, search }) {
         </Form>
         {user.username ? (
           <>
+            <Nav.Link href="/mypodcasts">My Podcasts</Nav.Link>
             <Nav.Link href="/profile">Account</Nav.Link>
             <Button variant="secondary" onClick={logOut}>Log Out</Button>
           </>
