@@ -35,7 +35,7 @@ function PodcastCard({ podcast }) {
       </div>
 
       <br />
-      <a href={`/podcasts/${podcast.id}`} className="stretched-link"></a>
+      <a href={`/podcasts/${podcast.id}`} className="stretched-link"> </a>
     </Card.Body>
   </Card><br /></div>
 }

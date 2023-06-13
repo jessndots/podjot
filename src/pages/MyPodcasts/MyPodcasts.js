@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import EpisodeList from "../../components/EpisodeList/EpisodeList";
-import { useSearchParams, createSearchParams } from "react-router-dom";
 import listenApi from "../../api/listenApi";
 import PodcastList from "../../components/PodcastList/PodcastList"
 import podjotApi from "../../api/podjotApi";
@@ -9,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "../../userContext";
 
 function MyPodcasts() {
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const [favPods, setFavPods] = useState([])
   const [favEps, setFavEps] = useState([])
@@ -97,7 +96,7 @@ function MyPodcasts() {
       getEpNotes();
     }
 
-  }, [podjotApi.token])
+  }, [])
 
   // const nextPage = function () {
   //   if (results && results.next_offset) {

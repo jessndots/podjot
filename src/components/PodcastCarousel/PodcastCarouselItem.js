@@ -9,7 +9,7 @@ function PodcastCarouselItem({ podcasts, podcast }) {
           <Card.Title style={{padding: '5px'}}>{podcast.title}</Card.Title>
           <Card.Subtitle>{podcast.publisher}</Card.Subtitle>
       </Card.Body>
-      <a href={`/podcasts/${podcast.id}`} className="stretched-link"></a>
+      <a href={`/podcasts/${podcast.id}`} className="stretched-link"> </a>
     </Card>
 }
 

@@ -26,10 +26,12 @@ class podjotApi {
       return (await axios({ url, method, data, params, headers })).data;
     } catch (err) {
       console.error("API Error:", err);
+      let message
       if (err.response) {
-        let message = err.response.data.error.message;
+        message = err.response.data.error.message;
+      } else {
+        message = err;
       }
-      let message = err;
       throw Array.isArray(message) ? message : [message];
     }
   }

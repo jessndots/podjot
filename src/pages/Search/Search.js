@@ -97,7 +97,7 @@ function Search() {
       <ul className="pagination">
         {page === 1 ? (
           <li className="page-item disabled">
-            <a className="page-link" href="#" tabIndex="-1">Previous</a>
+            <button className="page-link" href="#" tabIndex="-1">Previous</button>
           </li>
         ) : (
           <li className="page-item">

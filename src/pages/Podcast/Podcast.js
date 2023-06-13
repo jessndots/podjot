@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import listenApi from "../../api/listenApi";
 import EpisodeList from "../../components/EpisodeList/EpisodeList";
-import { Container, Row, Col, Pagination } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import parse from 'html-react-parser';
 import ActionCard from "../../components/ActionCard/ActionCard";
 import { useSearchParams } from "react-router-dom";
@@ -34,7 +34,7 @@ function Podcast() {
       }
     }
     fetchPodcast();
-  }, [podcastId, searchParams])
+  }, [podcastId, searchParams, page])
 
   // format time as year
   const getYear = function (milliseconds) {
@@ -83,7 +83,7 @@ function Podcast() {
       <ul className="pagination">
         {page === 1 ? (
           <li className="page-item disabled">
-            <a className="page-link" href="#" tabIndex="-1">Previous</a>
+            <button className="page-link" href="#" tabIndex="-1">Previous</button>
           </li>
         ) : (
           <li className="page-item">

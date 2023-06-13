@@ -87,7 +87,7 @@ function EpisodeCard({ episode, isDetailed }) {
       </>)
       }
 
-      <a href={`/podcasts/${podcastId}/episodes/${episode.id}`} className="stretched-link"></a>
+      <a href={`/podcasts/${podcastId}/episodes/${episode.id}`} className="stretched-link"> </a>
     </Card.Body>
   </Card>
     <br />

@@ -2,3 +2,4 @@
 /backend/db-password
 /backend/api-key
 .env
+.vercel

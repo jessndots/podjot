@@ -39,7 +39,7 @@ function UserProvider() {
       setTokenInLS("")
     }
   // eslint-disable-next-line+
-  }, [token])
+  }, [token, setTokenInLS, user.username])
 
 
   return (
