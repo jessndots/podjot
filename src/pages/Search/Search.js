@@ -94,26 +94,26 @@ function Search() {
     )}
 
     <nav aria-label="...">
-      <ul class="pagination">
+      <ul className="pagination">
         {page === 1 ? (
-          <li class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          <li className="page-item disabled">
+            <a className="page-link" href="#" tabIndex="-1">Previous</a>
           </li>
         ) : (
-          <li class="page-item">
-            <button class="page-link" onClick={prevPage}>Previous</button>
+          <li className="page-item">
+            <button className="page-link" onClick={prevPage}>Previous</button>
           </li>
         )}
-        <li class="page-item active">
-          <button class="page-link" href="#">{page} <span class="sr-only"></span></button>
+        <li className="page-item active">
+          <button className="page-link" href="#">{page} <span className="sr-only"></span></button>
         </li>
         {results && results.results.length === 10 && results.next_offset? (
-          <li class="page-item">
-            <button class="page-link" onClick={nextPage}>Next</button>
+          <li className="page-item">
+            <button className="page-link" onClick={nextPage}>Next</button>
           </li>
         ) : (
-          <li class="page-item disabled">
-            <button class="page-link">Next</button>
+          <li className="page-item disabled">
+            <button className="page-link">Next</button>
           </li>
         )}
 
